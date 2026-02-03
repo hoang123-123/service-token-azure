@@ -19,9 +19,10 @@ export default async function handler(req, res) {
     const TENANT_ID = process.env.TENANT_ID;
     const CLIENT_ID = process.env.CLIENT_ID;
     const CLIENT_SECRET = process.env.CLIENT_SECRET;
-    
-    // SCOPE cho Azure Resource Manager API (management.azure.com)
-    const SCOPE = 'https://management.azure.com/.default';
+
+    // SCOPE: Lấy từ body nếu có, nếu không dùng mặc định Azure Resource Manager API
+    const DEFAULT_SCOPE = 'https://management.azure.com/.default';
+    const requestedScope = req.body?.scope || DEFAULT_SCOPE;
     const MS_TOKEN_URL = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
 
     // --- 3. Kiểm tra Environment Variables ---
@@ -35,20 +36,20 @@ export default async function handler(req, res) {
 
     // --- 4. Chỉ chấp nhận POST ---
     if (req.method !== 'POST') {
-        return res.status(405).json({ 
+        return res.status(405).json({
             error: 'Method Not Allowed',
             message: 'Chỉ hỗ trợ phương thức POST'
         });
     }
 
     try {
-        console.log(`[Vercel] >>> Đang lấy Azure Management Token cho Client ID: ${CLIENT_ID.substring(0, 8)}...`);
+        console.log(`[Vercel] >>> Đang lấy Token với Scope: ${requestedScope}`);
 
         const params = new URLSearchParams();
         params.append('grant_type', 'client_credentials');
         params.append('client_id', CLIENT_ID);
         params.append('client_secret', CLIENT_SECRET);
-        params.append('scope', SCOPE);
+        params.append('scope', requestedScope);
 
         const response = await axios.post(MS_TOKEN_URL, params, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
