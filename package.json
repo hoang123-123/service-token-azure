@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Serverless proxy API để lấy Azure Resource Manager (ARM) Access Token",
   "main": "api/get-azure-token.js",
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"
@@ -11,7 +12,7 @@
     "axios": "^1.6.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "22.x"
   },
   "author": "",
   "license": "MIT"
